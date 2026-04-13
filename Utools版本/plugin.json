@@ -1,0 +1,32 @@
+{
+  "pluginName": "Typora 小助手",
+  "description": "YAML 生成器 & MD 字体颜色工具",
+  "main": "index.html",
+  "preload": "preload.js",
+  "logo": "logo.png",
+  "version": "1.0.0",
+  "author": "huyangpahuo",
+  "homepage": "",
+  "features": [
+    {
+      "code": "yaml",
+      "explain": "生成 Typora YAML 头部",
+      "cmds": [
+        "yaml",
+        "YAML生成器",
+        "typora",
+        "文章"
+      ]
+    },
+    {
+      "code": "color",
+      "explain": "MD 字体颜色工具",
+      "cmds": [
+        "字体颜色",
+        "color",
+        "颜色",
+        "font"
+      ]
+    }
+  ]
+}

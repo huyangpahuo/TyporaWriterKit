@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Typora 小助手</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+
+<body>
+    <div id="app">
+        <div class="typora-status" id="typora-status">
+            <span class="status-dot" id="status-dot"></span>
+            <span class="status-text" id="status-text">检测中...</span>
+            <button class="refresh-btn" id="refresh-status" title="刷新">🔄</button>
+        </div>
+
+        <nav class="nav-tabs">
+            <button class="tab-btn active" data-tab="yaml">📝 YAML</button>
+            <button class="tab-btn" data-tab="color">🎨 颜色</button>
+            <button class="tab-btn" data-tab="settings">⚙️ 设置</button>
+        </nav>
+
+        <div id="yaml-panel" class="panel active">
+            <div class="panel-content">
+                <div class="panel-header">
+                    <h2>文章属性</h2>
+                </div>
+                <div class="form-container" id="yaml-form"></div>
+            </div>
+            <div class="panel-footer">
+                <div class="btn-group">
+                    <button id="btn-copy" class="btn btn-primary">📋 复制到剪贴板</button>
+                    <button id="btn-preview" class="btn btn-secondary">👁️ 预览</button>
+                    <button id="btn-yaml-help" class="btn btn-info">📖</button>
+                </div>
+                <div id="yaml-preview" class="preview-box hidden">
+                    <pre id="yaml-output"></pre>
+                </div>
+            </div>
+        </div>
+
+        <div id="color-panel" class="panel">
+            <div class="panel-content">
+                <div class="panel-header">
+                    <h2>MD 字体颜色</h2>
+                    <p class="hint">💡 点击色块复制颜色代码，粘贴到 Typora 即可</p>
+                </div>
+                <div class="color-grid" id="color-grid"></div>
+                <div class="custom-color-section">
+                    <h3>自定义颜色</h3>
+                    <div class="custom-color-form">
+                        <div class="input-group">
+                            <label>HEX:</label>
+                            <input type="text" id="custom-hex" placeholder="FF0000" maxlength="6">
+                        </div>
+                        <div class="input-group">
+                            <label>RGB:</label>
+                            <input type="number" id="custom-r" placeholder="R" min="0" max="255">
+                            <input type="number" id="custom-g" placeholder="G" min="0" max="255">
+                            <input type="number" id="custom-b" placeholder="B" min="0" max="255">
+                        </div>
+                        <div class="input-group">
+                            <label>名称:</label>
+                            <input type="text" id="custom-name" placeholder="自定义" maxlength="7">
+                        </div>
+                        <div class="color-preview-box">
+                            <div id="color-preview"></div>
+                        </div>
+                    </div>
+                    <div class="btn-group">
+                        <button id="btn-refresh-preview" class="btn btn-secondary btn-small">刷新</button>
+                        <button id="btn-add-color" class="btn btn-primary btn-small">添加</button>
+                        <button id="btn-use-color" class="btn btn-success btn-small">复制</button>
+                    </div>
+                </div>
+            </div>
+            <div class="panel-footer">
+                <div class="btn-group">
+                    <button id="btn-restore-colors" class="btn btn-warning">恢复默认</button>
+                    <button id="btn-color-help" class="btn btn-info">📖 使用说明</button>
+                </div>
+            </div>
+        </div>
+
+        <div id="settings-panel" class="panel">
+            <div class="panel-content">
+                <div class="panel-header">
+                    <h2>全局设置</h2>
+                </div>
+                <div class="settings-section">
+                    <h3>属性管理 <span class="hint-inline">(右键编辑默认值)</span></h3>
+                    <div class="field-manager">
+                        <div class="field-list" id="field-list"></div>
+                        <div class="field-controls">
+                            <input type="text" id="new-field-name" placeholder="新属性名 (英文)">
+                            <button id="btn-add-field" class="btn btn-small btn-primary">➕</button>
+                        </div>
+                    </div>
+                </div>
+                <div class="settings-section">
+                    <h3>界面主题</h3>
+                    <div class="theme-color-section">
+                        <label>选择主题颜色:</label>
+                        <div class="theme-color-grid" id="theme-color-grid"></div>
+                    </div>
+                </div>
+            </div>
+            <div class="panel-footer">
+                <div class="btn-group">
+                    <button id="btn-save-settings" class="btn btn-primary">💾 保存设置</button>
+                    <button id="btn-reset-settings" class="btn btn-danger">🔄 重置</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="toast" class="toast hidden"></div>
+
+    <div id="modal-overlay" class="modal-overlay hidden">
+        <div class="modal">
+            <div class="modal-header">
+                <h3 id="modal-title">编辑默认值</h3>
+                <button class="modal-close" id="modal-close" type="button">&times;</button>
+            </div>
+            <div class="modal-body">
+                <p id="modal-field-name"></p>
+                <div class="modal-input-group">
+                    <label for="modal-default-input">默认值:</label>
+                    <textarea id="modal-default-input" rows="3" placeholder="输入默认值"></textarea>
+                </div>
+                <p class="hint">💡 Tags/Categories 用逗号分隔多个值</p>
+            </div>
+            <div class="modal-footer">
+                <button id="modal-cancel" class="btn btn-secondary" type="button">取消</button>
+                <button id="modal-save" class="btn btn-primary" type="button">保存</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="help-modal-overlay" class="modal-overlay hidden">
+        <div class="modal modal-help">
+            <div class="modal-header">
+                <h3 id="help-modal-title">使用说明</h3>
+                <button class="modal-close" id="help-modal-close" type="button">&times;</button>
+            </div>
+            <div class="modal-body modal-body-scroll">
+                <div id="help-content"></div>
+            </div>
+            <div class="modal-footer">
+                <button id="help-modal-ok" class="btn btn-primary" type="button">我知道了</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="js/app.js"></script>
+</body>
+
+</html>
